@@ -1,6 +1,3 @@
-/*
-	https://t.me/WebGPUDev
-	https://www.youtube.com/@gpudev
-*/
+import * as THREE from "three"
 
-console.log( "THREE.JS" )
+console.log( THREE.REVISION )
