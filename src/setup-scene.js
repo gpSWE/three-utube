@@ -9,7 +9,7 @@ export function setupScene( { canvas } ) {
 
 	// Camera
 	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 )
-	camera.position.set( 10, 10, 10 )
+	camera.position.set( 0, 30, 0 )
 
 	// Renderer
 	const renderer = new THREE.WebGLRenderer( { canvas } )
@@ -19,6 +19,7 @@ export function setupScene( { canvas } ) {
 	// Controls
 	const controls = new MapControls( camera, canvas )
 	controls.enableDamping = true
+	controls.zoomToCursor = true
 
 	// onResize
 	window.addEventListener( "resize", () => {
