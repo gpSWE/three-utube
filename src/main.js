@@ -8,38 +8,42 @@ const { scene } = setupScene( { canvas: document.getElementById( "webgl" ) } )
 // scene.add( new THREE.AxesHelper( 200 ) )
 // scene.add( new THREE.GridHelper( 20, 20, 0x808080, 0x404040 ) )
 
-const points = [
-	new THREE.Vector3( - 5, 0, 5 ),
-	new THREE.Vector3( + 5, 0, 5 ),
-	new THREE.Vector3( + 5, 0, - 5 ),
-	new THREE.Vector3( - 5, 0, - 5 ),
-	new THREE.Vector3( - 5, 5, - 5 ),
-	new THREE.Vector3( - 5, 5, + 5 ),
-]
+const textureLoader = new THREE.TextureLoader().setPath( "/assets/textures" )
 
-const indices = [
-	0, 1, 2, // triangle
-	2, 3, 0, // triangle
-	3, 4, 5, // triangle
-	5, 0, 3, // triangle
-]
+const uvChecker = textureLoader.load( "/uvChecker.png" )
+uvChecker.colorSpace = THREE.SRGBColorSpace
 
-const curve = new THREE.CubicBezierCurve3( ...points )
-const curvePoints = curve.getPoints( 30 )
-
-// Point
 {
-	const geometry = new THREE.BufferGeometry().setFromPoints( points )
-	const material = new THREE.PointsMaterial( { sizeAttenuation: false, size: 10, color: 0xffa500 } )
-	const object = new THREE.Points( geometry, material )
-	scene.add( object )
+	const geometry = new THREE.PlaneGeometry( 5, 5, 1, 1 ).rotateX( - Math.PI / 2 )
+	const material = new THREE.MeshBasicMaterial( { wireframe: !true, map: uvChecker } )
+	const object = new THREE.Mesh( geometry, material )
+	// scene.add( object )
+
+	console.log( geometry.attributes.position )
 }
 
-// Mesh (Triangles)
 {
-	const geometry = new THREE.BufferGeometry().setFromPoints( points )
-	geometry.setIndex( indices )
-	const material = new THREE.MeshBasicMaterial( { wireframe: !true } )
+	const positionArray = new Float32Array( [
+		- 2.5, 0, + 2.5,
+		+ 2.5, 0, + 2.5,
+		+ 2.5, 0, - 2.5,
+		- 2.5, 0, - 2.5,
+	] )
+
+	// const positionAttribute = new THREE.BufferAttribute( positionArray, 3 )
+	const positionAttribute = new THREE.Float32BufferAttribute( [
+		- 2.5, 0, + 2.5,
+		+ 2.5, 0, + 2.5,
+		+ 2.5, 0, - 2.5,
+		- 2.5, 0, - 2.5,
+	], 3 )
+
+	const geometry = new THREE.BufferGeometry()
+	geometry.setAttribute( "position", positionAttribute )
+	geometry.setIndex( [ 0, 1, 2, 2, 3, 0 ] )
+	const material = new THREE.MeshBasicMaterial( { wireframe: !true, map: uvChecker } )
 	const object = new THREE.Mesh( geometry, material )
 	scene.add( object )
+
+	// console.log( geometry.attributes )
 }

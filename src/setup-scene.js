@@ -9,7 +9,7 @@ export function setupScene( { canvas } ) {
 
 	// Camera
 	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 )
-	camera.position.set( 0, 30, 0 )
+	camera.position.set( 0, 10, 0 )
 
 	// Renderer
 	const renderer = new THREE.WebGLRenderer( { canvas } )
