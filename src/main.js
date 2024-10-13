@@ -1,38 +1,47 @@
 import * as THREE from "three"
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader"
 import { setupScene } from "./setup-scene"
 
 const { scene } = setupScene( { canvas: document.getElementById( "webgl" ) } )
 
 //
 
-scene.add( new THREE.AxesHelper( 200 ) )
-// scene.add( new THREE.GridHelper( 20, 20, 0x808080, 0x404040 ) )
+// scene.add( new THREE.AxesHelper( 200 ) )
+scene.add( new THREE.GridHelper( 20, 20, 0x808080, 0x404040 ) )
 
-// position (vertex)
-// normal (surface normals)
-// uv (texture coordinates)
-// color (color)
+const loader = new GLTFLoader().setPath( "/assets/glb" )
 
-{
-	const position = new THREE.Float32BufferAttribute( [
-		- 2.5, 0, + 2.5,
-		+ 2.5, 0, + 2.5,
-		+ 2.5, 0, - 2.5,
-		- 2.5, 0, - 2.5,
-	], 3 )
+loader.load( "/t_tower.glb", glb => {
 
-	const color = new THREE.Float32BufferAttribute( [
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1,
-		1, 1, 1,
-	], 3 )
+	const model = glb.scene
 
-	const geometry = new THREE.BufferGeometry()
-	geometry.setAttribute( "position", position )
-	geometry.setAttribute( "color", color )
-	geometry.setIndex( [ 0, 1, 2, 2, 3, 0 ] )
-	const material = new THREE.LineBasicMaterial( { vertexColors: true } )
-	const object = new THREE.Line( geometry, material )
-	scene.add( object )
-}
+	// model.scale.set( 0.5, 0.5, 0.5 )
+	// model.rotateX( - Math.PI / 2 )
+	// model.geometry.translate( 0, 0, 0 )
+	// model.position.set( 0, 0, 0 )
+
+	// console.log( model.matrixWorld )
+
+	model.traverse( node => {
+
+		if ( node.isMesh ) {
+
+			node.material = new THREE.MeshBasicMaterial()
+
+			const indices = node.geometry.getIndex()
+
+			const geometry = new THREE.BufferGeometry()
+			geometry.setIndex( indices )
+			geometry.setAttribute( "position", node.geometry.attributes.position )
+
+			const material = new THREE.PointsMaterial( { sizeAttenuation: false, size: 5 } )
+			const object = new THREE.Points( geometry, material )
+
+			object.applyMatrix4( node.matrixWorld )
+
+			scene.add( object )
+		}
+	} )
+
+	scene.add( model )
+} )
