@@ -5,7 +5,7 @@ export function setupScene( { canvas } ) {
 
 	// Scene
 	const scene = new THREE.Scene()
-	scene.background = new THREE.Color( 0x202020 )
+	// scene.background = new THREE.Color( 0x202020 )
 
 	// Camera
 	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 )
@@ -20,6 +20,9 @@ export function setupScene( { canvas } ) {
 	const controls = new MapControls( camera, canvas )
 	controls.enableDamping = true
 	controls.zoomToCursor = true
+	controls.autoRotate = true
+	controls.autoRotateSpeed = 0.5
+	controls.maxPolarAngle = Math.PI / 2 - 0.1
 
 	// onResize
 	window.addEventListener( "resize", () => {

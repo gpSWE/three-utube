@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader"
+import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler"
 import { setupScene } from "./setup-scene"
 
 const { scene } = setupScene( { canvas: document.getElementById( "webgl" ) } )
@@ -7,20 +8,18 @@ const { scene } = setupScene( { canvas: document.getElementById( "webgl" ) } )
 //
 
 // scene.add( new THREE.AxesHelper( 200 ) )
-scene.add( new THREE.GridHelper( 20, 20, 0x808080, 0x404040 ) )
+// scene.add( new THREE.GridHelper( 20, 20, 0x808080, 0x404040 ) )
 
 const loader = new GLTFLoader().setPath( "/assets/glb" )
 
-loader.load( "/t_tower.glb", glb => {
+loader.load( "/ring.glb", glb => {
 
 	const model = glb.scene
 
-	// model.scale.set( 0.5, 0.5, 0.5 )
-	// model.rotateX( - Math.PI / 2 )
-	// model.geometry.translate( 0, 0, 0 )
-	// model.position.set( 0, 0, 0 )
+	let meshIndex = 0
 
-	// console.log( model.matrixWorld )
+	let ring = new THREE.Object3D()
+	scene.add( ring )
 
 	model.traverse( node => {
 
@@ -28,20 +27,42 @@ loader.load( "/t_tower.glb", glb => {
 
 			node.material = new THREE.MeshBasicMaterial()
 
-			const indices = node.geometry.getIndex()
+			const sampler = new MeshSurfaceSampler( node ).build()
 
-			const geometry = new THREE.BufferGeometry()
-			geometry.setIndex( indices )
-			geometry.setAttribute( "position", node.geometry.attributes.position )
+			const points = []
+			const colors = []
 
-			const material = new THREE.PointsMaterial( { sizeAttenuation: false, size: 5 } )
+			for ( let i = 0; i < 100_000; i++ ) {
+
+				const point = new THREE.Vector3()
+
+				sampler.sample( point )
+
+				points.push( point )
+
+				if ( meshIndex === 0 ) {
+
+					colors.push( 1, 1, 1 )
+				}
+				else {
+
+					colors.push( 0, Math.random(), 1 )
+				}
+			}
+
+			//
+
+			const geometry = new THREE.BufferGeometry().setFromPoints( points )
+			geometry.setAttribute( "color", new THREE.Float32BufferAttribute( colors, 3 ) )
+			const material = new THREE.PointsMaterial( { sizeAttenuation: false, size: 1, vertexColors: true } )
 			const object = new THREE.Points( geometry, material )
 
 			object.applyMatrix4( node.matrixWorld )
+			ring.add( object )
 
-			scene.add( object )
+			meshIndex++
 		}
 	} )
 
-	scene.add( model )
+	ring.scale.multiplyScalar( 5 )
 } )
